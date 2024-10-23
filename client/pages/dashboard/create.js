@@ -19,8 +19,8 @@ import {
 	Spinner,
 	Text,
 } from "@chakra-ui/react";
-import { useStorageUpload, Web3Button } from "@thirdweb-dev/react";
 import { useStateContext } from "../../context";
+import { ThirdwebStorage } from "@thirdweb-dev/storage";
 
 export default function Create() {
 	const wrapperRef = useRef(null);
@@ -31,7 +31,11 @@ export default function Create() {
 	const [cid, setCid] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
 	const { createSafe, addAllowed } = useStateContext();
-	const { mutateAsync: upload } = useStorageUpload();
+	const storage = new ThirdwebStorage({
+		clientId: "fb54bb3a7a6bfcf5c1cd07c60bf4652f", 
+	  });
+	  
+	  
 	const router = useRouter();
 
 	function handleNextTab() {
@@ -78,13 +82,12 @@ export default function Create() {
 
 	async function handleSubmit() {
 		setIsLoading(true);
-		const uris = await upload({ data: fileList });
-		// console.log(uris);
-		const cid = uris[0].slice(7).split("/")[0];
-		setCid(cid);
+		const uris = await storage.upload({ data: fileList });
+		console.log(uris);
+		setCid(uris);
 		const fList = [];
 		for (let x = 0; x < uris.length; x++) {
-			fList.push(uris[x].slice(7).split("/")[1]);
+			fList.push(uris);
 		}
 		setFileList(fList);
 		setIsLoading(false);
@@ -146,32 +149,35 @@ export default function Create() {
 										<div
 											className={styles.previewFiles}
 										>
-											{fileList.map((item, index) => (
-												<div
-													key={index}
-													className={
-														styles.filebox
-													}
-												>
-													<Tag
-														size="lg"
-														borderRadius="full"
-														variant="solid"
-														bg="transparent"
+											{fileList.map((item, index) =>{
+												console.log(item,index)
+												return  (
+													<div
+														key={index}
+														className={
+															styles.filebox
+														}
 													>
-														<TagLabel>
-															{item.name}
-														</TagLabel>
-														<TagCloseButton
-															onClick={() => {
-																fileRemove(
-																	item
-																);
-															}}
-														/>
-													</Tag>
-												</div>
-											))}
+														<Tag
+															size="lg"
+															borderRadius="full"
+															variant="solid"
+															bg="transparent"
+														>
+															<TagLabel>
+																{item.name}
+															</TagLabel>
+															<TagCloseButton
+																onClick={() => {
+																	fileRemove(
+																		item
+																	);
+																}}
+															/>
+														</Tag>
+													</div>
+												)
+											})}
 											<div
 												className={
 													styles.buttonContainer

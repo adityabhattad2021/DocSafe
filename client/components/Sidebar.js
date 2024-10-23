@@ -3,11 +3,11 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 
 import { Button, Image } from "@chakra-ui/react";
-import { useAddress } from "@thirdweb-dev/react";
+import { useAccount } from "wagmi";
 import { useEffect } from "react";
 
 export default function Sidebar() {
-	const address = useAddress();
+	const {address} = useAccount();
 
 	const router = useRouter();
 	const path = router.asPath.split("/").pop();

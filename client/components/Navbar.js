@@ -2,13 +2,13 @@ import styles from "../styles/Navbar.module.css";
 
 import { useRouter } from "next/router";
 import { useStateContext } from "../context";
-import { ConnectWallet,useNetwork  } from "@thirdweb-dev/react";
 import { useEffect } from "react";
 import { Image } from "@chakra-ui/react";
 
 export default function Navbar() {
 	const router = useRouter();
 	const { address } = useStateContext();
+	console.log(address)
 
 	useEffect(()=>{
 		if(address){
@@ -23,7 +23,7 @@ export default function Navbar() {
 				DocSafe
 			</div>
 			<div className={styles.wallet}>
-				<ConnectWallet />
+				<w3m-button/>
 			</div>
 		</div>
 	);

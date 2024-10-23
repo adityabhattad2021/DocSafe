@@ -97,27 +97,21 @@ export default function MyFiles() {
 		}
 	};
 
-	const openPdfFileHandler = (cid, filename) => {
-		router.push(`/view-pdf/${cid}?filename=${filename}`);
-	};
-
-	const openMediaFileHandler = (cid, filename) => {
-		router.push(`/view-media/${cid}?filename=${filename}`);
-	};
+	// const openMediaFileHandler = (cid, filename) => {
+	// 	router.push(`/view-media/${cid}?filename=${filename}`);
+	// };
 
 	const viewFileHandler = (cid, filename) => {
-		const formattedCid = cid.split("/")[0];
-		console.log("CID", formattedCid);
-
+		// Extract the CID and suffix from ipfs://<cid>/<suffix> format
+		const ipfsMatch = cid.match(/ipfs:\/\/([^/]+)\/(.+)/);
+		const formattedCid = ipfsMatch 
+			? `${ipfsMatch[1]}/${ipfsMatch[2]}` // Keep the full path: CID/suffix
+			: cid;
+		console.log("CID with suffix", formattedCid);
+	
 		const formattedFilename = encodeURIComponent(filename);
 		console.log("Filename", formattedFilename);
-
-		const filetype = formattedFilename.split(".")[1].toLocaleLowerCase();
-
-		if (filetype === "pdf") {
-			return openPdfFileHandler(formattedCid, formattedFilename);
-		}
-
+	
 		const mediaFileTypes = [
 			"mp4",
 			"jpeg",
@@ -127,9 +121,15 @@ export default function MyFiles() {
 			"webp",
 			"svg",
 		];
-		if (mediaFileTypes.includes(filetype)) {
-			return openMediaFileHandler(formattedCid, formattedFilename);
-		}
+	
+		return openMediaFileHandler(formattedCid, formattedFilename);
+	};
+	
+	const openMediaFileHandler = (cid, filename) => {
+		router.push({
+			pathname: '/view-media',
+			query: { cid, filename }
+		});
 	};
 
 	return (
@@ -161,58 +161,57 @@ export default function MyFiles() {
 					>
 						{files?.length > 0 ? (
 							files.map((item, index) => {
-								for (let x = 0; x < item[3].length; x++) {
-									console.log("Item", item[3][x]);
-									return (
-										<motion.div
-											key={index}
-											className={styles.filebox}
-											style={{
-												userSelect: trackMouse
-													? "none"
-													: "auto",
-											}}
+
+								return (
+									<motion.div
+										key={index}
+										className={styles.filebox}
+										style={{
+											userSelect: trackMouse
+												? "none"
+												: "auto",
+										}}
+									>
+										<div
+											className={
+												styles.fileTextHolder
+											}
 										>
-											<div
-												className={
-													styles.fileTextHolder
-												}
+											<Tag
+												size="lg"
+												borderRadius="full"
+												variant="solid"
+												bg="transparent"
+												color="white"
 											>
-												<Tag
-													size="lg"
-													borderRadius="full"
-													variant="solid"
-													bg="transparent"
-													color="white"
-												>
-													<TagLabel>
-														{item[4][x]}
-													</TagLabel>
-												</Tag>
-												<Menu>
-													<MenuButton>
-														<BsThreeDots color="white" />
-													</MenuButton>
-													<MenuList>
-														<MenuItem
-															onClick={() =>
-																viewFileHandler(
-																	item[1],
-																	item[4][x]
-																)
-															}
-														>
-															View
-														</MenuItem>
-														<MenuItem>
-															Share
-														</MenuItem>
-													</MenuList>
-												</Menu>
-											</div>
-										</motion.div>
-									);
-								}
+												<TagLabel>
+													{item.name}
+												</TagLabel>
+											</Tag>
+											<Menu>
+												<MenuButton>
+													<BsThreeDots color="white" />
+												</MenuButton>
+												<MenuList>
+													<MenuItem
+														onClick={() =>
+															viewFileHandler(
+																item.cid,
+																item.name
+															)
+														}
+													>
+														View
+													</MenuItem>
+													<MenuItem>
+														Share
+													</MenuItem>
+												</MenuList>
+											</Menu>
+										</div>
+									</motion.div>
+								);
+
 							})
 						) : (
 							<Heading color="white">No files found</Heading>

@@ -21,6 +21,7 @@ export default function SharedFiles() {
 	const router = useRouter();
 
 	useEffect(() => {
+		console.log("Is this working!!")
 		if (address) {
 			fetchSafesSharedWithUser(address)
 				.then((res) => {
@@ -31,29 +32,21 @@ export default function SharedFiles() {
 					console.log("Error", err);
 				});
 		}
+		
 	}, []);
 
-	const openPdfFileHandler = (cid, filename) => {
-		router.push(`/view-pdf/${cid}?filename=${filename}`);
-	};
-
-	const openMediaFileHandler = (cid, filename) => {
-		router.push(`/view-media/${cid}?filename=${filename}`);
-	};
 
 	const viewFileHandler = (cid, filename) => {
-		const formattedCid = cid.split("/")[0];
-		console.log("CID", formattedCid);
-
+		// Extract the CID and suffix from ipfs://<cid>/<suffix> format
+		const ipfsMatch = cid.match(/ipfs:\/\/([^/]+)\/(.+)/);
+		const formattedCid = ipfsMatch 
+			? `${ipfsMatch[1]}/${ipfsMatch[2]}` // Keep the full path: CID/suffix
+			: cid;
+		console.log("CID with suffix", formattedCid);
+	
 		const formattedFilename = encodeURIComponent(filename);
 		console.log("Filename", formattedFilename);
-
-		const filetype = formattedFilename.split(".")[1].toLocaleLowerCase();
-
-		if (filetype === "pdf") {
-			return openPdfFileHandler(formattedCid, formattedFilename);
-		}
-
+	
 		const mediaFileTypes = [
 			"mp4",
 			"jpeg",
@@ -63,10 +56,17 @@ export default function SharedFiles() {
 			"webp",
 			"svg",
 		];
-		if (mediaFileTypes.includes(filetype)) {
-			return openMediaFileHandler(formattedCid, formattedFilename);
-		}
+	
+		return openMediaFileHandler(formattedCid, formattedFilename);
 	};
+	
+	const openMediaFileHandler = (cid, filename) => {
+		router.push({
+			pathname: '/view-media',
+			query: { cid, filename }
+		});
+	};
+
 
 	return (
 		<Layout>
@@ -105,36 +105,33 @@ export default function SharedFiles() {
 							<Tbody>
 								{fileList?.length > 0 &&
 									fileList.map((item, index) => {
-										for (
-											let x = 0;
-											x < item[3].length;
-											x++
-										) {
+
 											return (
 												<Tr
 													key={index}
 													onClick={() =>
 														viewFileHandler(
-															item[1],
-															item[4][x]
+															item.cid,
+															item.name
 														)
 													}
 													color="white"
+													style={{'cursor':'pointer'}}
 												>
 													<Td color="white">
-														{item[4][x]}
+														{item.name}
 													</Td>
 													<Td color="white">
-														{item[2]}
+														{item.owner}
 													</Td>
 												</Tr>
 											);
-										}
+										
 										<Tr key={index} color="white">
 											<Td color="white">
-												{item.filename}
+												{item.name}
 											</Td>
-											<Td color="white">{item.sender}</Td>
+											<Td color="white">{item.owner}</Td>
 										</Tr>;
 									})}
 							</Tbody>

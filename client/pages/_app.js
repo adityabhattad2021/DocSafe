@@ -1,9 +1,12 @@
-import { ThirdwebProvider } from "@thirdweb-dev/react";
-import { MantleTestnet,Localhost } from "@thirdweb-dev/chains";
+
 import { ChakraProvider } from "@chakra-ui/react";
 import "../styles/globals.css";
 import { extendTheme } from "@chakra-ui/react";
 import { StateContextProvider } from "../context";
+import { AppKitProvider } from "../wagmi/config";
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+
+const queryClient = new QueryClient()
 
 
 const theme = extendTheme({
@@ -16,13 +19,15 @@ const theme = extendTheme({
 
 function MyApp({ Component, pageProps }) {
 	return (
-		<ThirdwebProvider activeChain={MantleTestnet}>
-			<ChakraProvider theme={theme}>
-				<StateContextProvider>
-					<Component {...pageProps} />
-				</StateContextProvider>
-			</ChakraProvider>
-		</ThirdwebProvider>
+		<AppKitProvider>
+			<QueryClientProvider client={queryClient}>
+				<ChakraProvider theme={theme}>
+					<StateContextProvider>
+						<Component {...pageProps} />
+					</StateContextProvider>
+				</ChakraProvider>
+			</QueryClientProvider>
+		</AppKitProvider>
 	);
 }
 

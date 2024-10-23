@@ -1,20 +1,18 @@
-import { useRouter } from 'next/router'
-import { MediaRenderer } from "@thirdweb-dev/react";
+import { useRouter } from 'next/router';
 import { Flex } from '@chakra-ui/react';
 
 export default function PDF() {
-    const router = useRouter()
-    const { cid, filename } = router.query
+    const router = useRouter();
+    const { cid, filename } = router.query;
+
+    if (!cid) return null;
 
     return (
         <Flex align="center" justify="center" height="100vh" width="100vw" backgroundColor="#2B2C30">
-            <MediaRenderer
-                requireInteraction={true}
-                controls={true}
-                height="75vh"
-                width='fit-content'
-                style={{ backgroundColor: "#2B2C30" }}
-                src={`ipfs://${cid}/${filename}`}
+            <img
+                src={`https://ipfs.io/ipfs/${cid}`}
+                alt={filename || 'IPFS content'}
+                style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
             />
         </Flex>
     );
