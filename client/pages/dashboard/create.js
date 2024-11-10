@@ -33,7 +33,7 @@ export default function Create() {
 	const { createSafe, addAllowed } = useStateContext();
 	const storage = new ThirdwebStorage({
 		clientId: "fb54bb3a7a6bfcf5c1cd07c60bf4652f", 
-	  });
+	});
 	  
 	  
 	const router = useRouter();
@@ -83,7 +83,6 @@ export default function Create() {
 	async function handleSubmit() {
 		setIsLoading(true);
 		const uris = await storage.upload({ data: fileList });
-		console.log(uris);
 		setCid(uris);
 		const fList = [];
 		for (let x = 0; x < uris.length; x++) {
@@ -96,7 +95,7 @@ export default function Create() {
 
 	async function handleAddDetails() {
 		setIsLoading(true);
-		await createSafe(safeName, cid, fileList);
+		await createSafe(safeName, cid, [fileList[0]]);
 		await addAllowed(safeName, shareWith[0]);
 		setIsLoading(false);
 		router.push("/dashboard/myFiles");
@@ -150,7 +149,7 @@ export default function Create() {
 											className={styles.previewFiles}
 										>
 											{fileList.map((item, index) =>{
-												console.log(item,index)
+								
 												return  (
 													<div
 														key={index}

@@ -61,6 +61,17 @@ export default function Sidebar() {
 									Access via NFT
 								</div>
 							</Link>
+							<Link href="/dashboard/nftManagement">
+								<div
+									className={
+										path === "nftManagement"
+											? styles.selectedLink
+											: styles.link
+									}
+								>
+									NFT Management
+								</div>
+							</Link>
 
 							<Link href="/dashboard/create">
 								<div

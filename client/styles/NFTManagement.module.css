@@ -1,0 +1,72 @@
+.container {
+    background: #2B2C30;
+    width: 80%;
+    display: flex;
+    height: 100%;
+    justify-content: center;
+    padding-top: 70px;
+    padding-left: 50px;
+    padding-right: 50px;
+    overflow-y: auto;
+}
+
+.tabHolder {
+    width: 80%;
+    margin-top: 100px;
+}
+
+.formHolder {
+    width: 100%;
+    margin-top: 40px;
+    display: flex;
+    flex-direction: column;
+    background: #222326;
+    border-radius: 35px;
+    padding: 30px;
+    gap: 40px;
+}
+
+.addressesHolder {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    padding: 20px 0;
+}
+
+.inputField {
+    background: #2B2C30 !important;
+    border: 1px solid #4B4D54 !important;
+    color: white !important;
+    font-family: 'Poppins', sans-serif;
+}
+
+.inputField::placeholder {
+    color: #4B4D54;
+}
+
+.selectField {
+    background: #2B2C30 !important;
+    border: 1px solid #4B4D54 !important;
+    color: white !important;
+    font-family: 'Poppins', sans-serif;
+}
+
+.selectField option {
+    background: #2B2C30;
+    color: white;
+}
+
+.actionButton {
+    background: #4285F4 !important;
+    color: white !important;
+    border-radius: 20px !important;
+    height: 50px !important;
+    font-family: 'Poppins', sans-serif !important;
+    font-size: 20px !important;
+    margin-top: 20px !important;
+}
+
+.actionButton:hover {
+    background: #3b75d9 !important;
+    opacity: 0.9;
+}

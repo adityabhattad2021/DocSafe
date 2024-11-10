@@ -1,162 +1,167 @@
 import Layout from "../../layout/layout";
 import styles from "../../styles/AccessViaNFT.module.css";
 import { useStateContext } from "../../context";
+import { BsThreeDots } from "react-icons/bs";
 import {
-	FormControl,
-	FormLabel,
-	Input,
-	Button,
-	Table,
-	Thead,
-	Tbody,
-	Tr,
-	Th,
-	Td,
-	TableContainer,
-	Text,
+    FormControl,
+    FormLabel,
+    Input,
+    Button,
+    Table,
+    Thead,
+    Tbody,
+    Tr,
+    Th,
+    Td,
+    TableContainer,
+    Tag,
+    TagLabel,
+    Menu,
+    MenuButton,
+    MenuList,
+    MenuItem,
+    Box,
+    Heading,
+    useColorModeValue,
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { useRouter } from "next/router";
 
 export default function AccessViaNFT() {
-	const { fetchSafesForNFT } = useStateContext();
-	const [nft, setNFT] = useState();
-	const [isLoading, setIsLoading] = useState(false);
-	const [safes, setSafes] = useState([]);
+    const { fetchSafesForNFT } = useStateContext();
+    const [nft, setNFT] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
+    const [safes, setSafes] = useState([]);
     const router = useRouter();
 
-	async function handleSubmit(nftAddress) {
-		const safeA = await fetchSafesForNFT(nftAddress);
-		setSafes(safeA);
-	}
+    async function handleSubmit(nftAddress) {
+        try {
+            setIsLoading(true);
+            const safeA = await fetchSafesForNFT(nftAddress);
+            setSafes(safeA);
+        } catch (error) {
+            console.error("Error fetching safes:", error);
+        } finally {
+            setIsLoading(false);
+        }
+    }
 
-    const openPdfFileHandler = (cid, filename) => {
-		router.push(`/view-pdf/${cid}?filename=${filename}`);
-	};
+    const viewFileHandler = (cid, filename) => {
+        const ipfsMatch = cid.match(/ipfs:\/\/([^/]+)\/(.+)/);
+        const formattedCid = ipfsMatch 
+            ? `${ipfsMatch[1]}/${ipfsMatch[2]}`
+            : cid;
+        const formattedFilename = encodeURIComponent(filename);
+        return openMediaFileHandler(formattedCid, formattedFilename);
+    };
+    
+    const openMediaFileHandler = (cid, filename) => {
+        router.push({
+            pathname: '/view-media',
+            query: { cid, filename }
+        });
+    };
 
-	const openMediaFileHandler = (cid, filename) => {
-		router.push(`/view-media/${cid}?filename=${filename}`);
-	};
+    return (
+        <Layout>
+            <div className={styles.container}>
+                <div className={styles.formHolder}>
+                    <Box className={styles.formSection}>
+                        <Heading as="h1" size="lg" color="white" mb={4}>
+                            Access NFT Files
+                        </Heading>
+                        <FormControl isRequired>
+                            <FormLabel color="white">NFT Address</FormLabel>
+                            <Input
+                                placeholder="Enter the NFT address here..."
+                                size="lg"
+                                type="text"
+                                value={nft}
+                                onChange={(e) => setNFT(e.target.value)}
+                                className={styles.formHolder}
+                                _placeholder={{ color: "whiteAlpha.400" }}
+                                borderColor="whiteAlpha.200"
+                                _hover={{ borderColor: "whiteAlpha.300" }}
+                                _focus={{ 
+                                    borderColor: "whiteAlpha.400",
+                                    boxShadow: "0 0 0 1px rgba(255, 255, 255, 0.2)"
+                                }}
+                            />
+                        </FormControl>
+		                 <Button
+                            onClick={() => handleSubmit(nft)}
+                            isLoading={isLoading}
+                            loadingText="Submitting"
+                            spinnerPlacement="end"
+                        >
+                            Submit
+                        </Button>
+                    </Box>
 
-	const viewFileHandler = (cid, filename) => {
-		const formattedCid = cid.split("/")[0];
-		console.log("CID", formattedCid);
-
-		const formattedFilename = encodeURIComponent(filename);
-		console.log("Filename", formattedFilename);
-
-		const filetype = formattedFilename.split(".")[1].toLocaleLowerCase();
-
-		if (filetype === "pdf") {
-			return openPdfFileHandler(formattedCid, formattedFilename);
-		}
-
-		const mediaFileTypes = [
-			"mp4",
-			"jpeg",
-			"jpg",
-			"png",
-			"gif",
-			"webp",
-			"svg",
-		];
-		if (mediaFileTypes.includes(filetype)) {
-			return openMediaFileHandler(formattedCid, formattedFilename);
-		}
-	};
-
-	return (
-		<Layout>
-			<div className={styles.container}>
-				<div className={styles.formHolder}>
-					<FormControl isRequired color="white">
-						<FormLabel>NFT Address</FormLabel>
-						<Input
-							placeholder="Enter the NFT address here..."
-							size="lg"
-							type="name"
-							value={nft}
-							onChange={(e) => setNFT(e.target.value)}
-						/>
-					</FormControl>
-					<Button
-						color="white"
-						bg="brand.100"
-						size="lg"
-						onClick={() => handleSubmit(nft)}
-						isLoading={isLoading}
-						_loading={{
-							color: "white",
-						}}
-					>
-						Submit
-					</Button>
-                    {
-                   safes?.length > 0 && (
-                    <TableContainer marginX="2rem">
-						<Table color="white" variant="simple" fontSize={25}>
-							<Thead>
-								<Tr>
-									<Th
-										fontSize={30}
-										textTransform={"capitalize"}
-										fontFamily={"sans-serif"}
-										color="white"
-									>
-										File Name
-									</Th>
-									<Th
-										fontSize={30}
-										textTransform={"capitalize"}
-										color="white"
-									>
-										Shared By
-									</Th>
-								</Tr>
-							</Thead>
-							<Tbody>
-								{safes?.length > 0 &&
-									safes.map((item, index) => {
-										for (
-											let x = 0;
-											x < item[3].length;
-											x++
-										) {
-											return (
-												<Tr
-													key={index}
-													onClick={() =>
-														viewFileHandler(
-															item[1],
-															item[4][x]
-														)
-													}
-													color="white"
-												>
-													<Td color="white">
-														{item[4][x]}
-													</Td>
-													<Td color="white">
-														{item[2]}
-													</Td>
-												</Tr>
-											);
-										}
-										<Tr key={index} color="white">
-											<Td color="white">
-												{item.filename}
-											</Td>
-											<Td color="white">{item.sender}</Td>
-										</Tr>;
-									})}
-							</Tbody>
-						</Table>
-					</TableContainer>
-                   )
-                }
-				</div>
-                
-			</div>
-		</Layout>
-	);
+                    {safes?.length > 0 && (
+                        <Box className={styles.tableContainer}>
+                            <TableContainer>
+                                <Table variant="simple" className={styles.table}>
+                                    <Thead className={styles.tableHeader}>
+                                        <Tr>
+                                            <Th color="white">File Name</Th>
+                                            <Th color="white">Shared By</Th>
+                                            <Th width="50px"></Th>
+                                        </Tr>
+                                    </Thead>
+                                    <Tbody>
+                                        {safes.map((item, index) => (
+                                            <Tr key={index} className={styles.tableRow}>
+                                                <Td>
+                                                    <Tag
+                                                        size="lg"
+                                                        borderRadius="full"
+                                                        variant="subtle"
+                                                        bg="whiteAlpha.100"
+                                                        color="white"
+                                                    >
+                                                        <TagLabel>{item.name}</TagLabel>
+                                                    </Tag>
+                                                </Td>
+                                                <Td color="white">{item.owner || "—"}</Td>
+                                                <Td>
+                                                    <Menu>
+                                                        <MenuButton
+                                                            as={Button}
+                                                            variant="ghost"
+                                                            className={styles.menuButton}
+                                                            p={2}
+                                                            minW="auto"
+                                                        >
+                                                            <BsThreeDots color="white" />
+                                                        </MenuButton>
+                                                        <MenuList
+                                                            bg="gray.800"
+                                                            borderColor="whiteAlpha.200"
+                                                        >
+                                                            <MenuItem
+                                                                onClick={() => viewFileHandler(item.cid, item.name)}
+                                                                _hover={{ bg: "whiteAlpha.100" }}
+                                                            >
+                                                                View
+                                                            </MenuItem>
+                                                            <MenuItem
+                                                                _hover={{ bg: "whiteAlpha.100" }}
+                                                            >
+                                                                Share
+                                                            </MenuItem>
+                                                        </MenuList>
+                                                    </Menu>
+                                                </Td>
+                                            </Tr>
+                                        ))}
+                                    </Tbody>
+                                </Table>
+                            </TableContainer>
+                        </Box>
+                    )}
+                </div>
+            </div>
+        </Layout>
+    );
 }

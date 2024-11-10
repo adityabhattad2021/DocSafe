@@ -20,6 +20,8 @@ export function StateContextProvider({ children }) {
 
 	async function createSafe(name, cid, fileNames) {
         try {
+            console.log(name,cid,fileNames);
+            
             const { request } = await simulateContract(wagmiConfig, {
                 address: contractAddress,
                 abi: contractABI,
