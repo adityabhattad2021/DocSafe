@@ -1,7 +1,7 @@
 import { createAppKit } from '@reown/appkit/react'
 
 import { http, WagmiProvider } from 'wagmi'
-import { hardhat } from '@reown/appkit/networks'
+import { foundry, hardhat } from '@reown/appkit/networks'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi'
 
@@ -20,16 +20,16 @@ const metadata = {
 }
 
 // 3. Set the networks
-const networks = [hardhat]
+const networks = [foundry]
 
 // 4. Create Wagmi Adapter
 export const wagmiAdapter = new WagmiAdapter({
-    chains: [hardhat],
+    chains: [foundry],
     networks,
     projectId,
     ssr: true,
     transports: {
-        [hardhat.id]: http("http://localhost:8545")
+        [foundry.id]: http("http://localhost:8545")
     }
 })
 

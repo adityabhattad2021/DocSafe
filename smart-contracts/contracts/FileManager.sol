@@ -157,10 +157,10 @@ contract FileManager {
     }
 
     function getSafesForNFT(address NFT) public view returns(Safe[] memory) {
-        require(
-            IERC721(NFT).balanceOf(msg.sender) > 0,
-            "You must own an acceptance NFT to vote for a proposal"
-        );
+        // require(
+        //     IERC721(NFT).balanceOf(msg.sender) > 0,
+        //     "You must own an acceptance NFT to vote for a proposal"
+        // );
 
         uint256 count = 0;
         for (uint256 i = 1; i <= safeCount; i++) {

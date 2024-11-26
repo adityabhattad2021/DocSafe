@@ -131,6 +131,7 @@ export function StateContextProvider({ children }) {
     }
 
     async function fetchSafesForNFT(nftAddress) {
+        console.log(address)
         try {
             const result = await readContract(wagmiConfig, {
                 address: contractAddress,
